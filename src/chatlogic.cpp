@@ -33,7 +33,12 @@ ChatLogic::~ChatLogic()
     ////
 
     // delete chatbot instance
-    delete _chatBot;
+    if (_chatBot != nullptr)
+    {
+        delete _chatBot;
+        _chatBot =  nullptr;
+    }
+    
 
     // delete all nodes
     for (auto it = std::begin(_nodes); it != std::end(_nodes); ++it)

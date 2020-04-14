@@ -23,15 +23,51 @@ private:
 
 public:
     // constructors / destructors
-    ChatBot();                     // constructor WITHOUT memory allocation
-    ChatBot(std::string filename); // constructor WITH memory allocation
-    ~ChatBot();
+    ChatBot() : _image(new wxBitmap()) // constructor WITHOUT memory allocation
+    {     
+        // invalidate data handles
+        _image = NULL;
+        _chatLogic = nullptr;
+        _rootNode = nullptr;
+    }                    
+    ChatBot(const std::string& filename) : _image(new wxBitmap(filename, wxBITMAP_TYPE_PNG))
+    {
+        _chatLogic = nullptr;
+        _rootNode = nullptr;
+    } // constructor WITH memory allocation
+    
+    ~ChatBot(){
+        if(_image != NULL){
+            delete _image;
+            _image = NULL;
+        }
+    }
 
-    //// STUDENT CODE
-    ////
+    ChatBot(ChatBot&& movedObj) : _image(movedObj._image)
+    {
+        movedObj._image = NULL;
+    }
 
-    ////
-    //// EOF STUDENT CODE
+    ChatBot& operator=(const ChatBot& obj) {
+        if (&obj != this) {
+            delete _image;
+            _image = NULL;
+            _image = new wxBitmap();
+            _image = obj._image;
+        }
+
+        return *this;
+    }
+
+    ChatBot& operator=(ChatBot&& obj) {
+        if(&obj != this) {
+            delete _image;
+            _image = obj._image;
+            obj._image = NULL;
+        }
+
+        return *this;
+    }
 
     // getters / setters
     void SetCurrentNode(GraphNode *node);
