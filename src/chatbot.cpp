@@ -8,7 +8,103 @@
 #include "graphedge.h"
 #include "chatbot.h"
 
+// constructors / destructors
+ChatBot::ChatBot()// constructor WITHOUT memory allocation
+{     
+    // invalidate data handles
+    std::cout << "Chat Bot (default) Constructor w/o passing string" << std::endl;
+    _image = new wxBitmap();
+    _chatLogic = nullptr;
+    _rootNode = nullptr;
+}                    
 
+ChatBot::ChatBot(std::string filename)
+{
+    std::cout << "Chat Bot Constructor w/ filename arg" << std::endl;
+    _image = new wxBitmap(filename, wxBITMAP_TYPE_PNG);
+    _chatLogic = nullptr;
+    _rootNode = nullptr;
+} // constructor WITH memory allocation
+
+ChatBot::~ChatBot()
+{
+    std::cout << "Chat Bot Destructor" << std::endl;
+    if(_image != NULL){
+        delete _image;
+        _image = NULL;
+    }
+}
+
+ChatBot::ChatBot(ChatBot &&movedObj)
+{
+    std::cout << "Chat Bot Move Constructor" << std::endl;
+    // get all info from the passed object and move it to the newly created object
+    _currentNode = movedObj._currentNode;
+    _rootNode = movedObj._rootNode;
+    _chatLogic = movedObj._chatLogic;
+    _image = movedObj._image;
+  
+    _chatLogic->SetChatbotHandle(this);
+   
+    movedObj._currentNode = nullptr;
+    movedObj._rootNode = nullptr;
+    movedObj._chatLogic = nullptr;
+    movedObj._image = NULL; 
+}
+
+ChatBot::ChatBot(const ChatBot &obj) 
+{
+    std::cout << "Chat Bot Copy Constructr" << std::endl;
+    _currentNode = obj._currentNode;
+    _rootNode = obj._rootNode;
+    _chatLogic = obj._chatLogic;
+    _image = new wxBitmap(*obj._image);  
+}
+
+ChatBot &ChatBot::operator=(const ChatBot &obj) {
+    std::cout << "Chat Bot copy operator" << std::endl;
+    if (this == &obj) {
+        return *this;
+    }
+    
+    if(_image != NULL) // Attention: wxWidgets used NULL and not nullptr
+    {
+        delete _image;
+        _image = NULL;
+    }
+    _currentNode = obj._currentNode;
+    _rootNode = obj._rootNode;
+    _chatLogic = obj._chatLogic;
+    _image = new wxBitmap(*obj._image);   
+    return *this;
+}
+
+ChatBot &ChatBot::operator=(ChatBot &&obj) {
+    std::cout << "Chat Bot Move Assignment Operator" << std::endl;
+    if (this == &obj) {
+        return *this;
+    }
+
+    if(_image != NULL) // Attention: wxWidgets used NULL and not nullptr
+    {
+        delete _image;
+        _image = NULL;
+    }
+    
+    _currentNode = obj._currentNode;
+    _rootNode = obj._rootNode;
+    _chatLogic = obj._chatLogic;
+        _image = obj._image;
+    
+    _chatLogic->SetChatbotHandle(this);
+    
+    obj._currentNode = nullptr;
+    obj._rootNode = nullptr;
+    obj._chatLogic = nullptr;
+    obj._image = NULL; 
+    
+    return *this;
+}
 
 void ChatBot::ReceiveMessageFromUser(std::string message)
 {
